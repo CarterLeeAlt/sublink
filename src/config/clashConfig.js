@@ -9,6 +9,8 @@ export const CLASH_CONFIG = {
 	'allow-lan': false,
 	'mode': 'rule',
 	'log-level': 'info',
+	'unified-delay': true,
+	'tcp-concurrent': true,
 	'geodata-mode': true,
 	'geo-auto-update': true,
 	'geodata-loader': 'standard',
@@ -28,21 +30,21 @@ export const CLASH_CONFIG = {
 		'respect-rules': true,
 		'enhanced-mode': 'fake-ip',
 		'nameserver': [
-			'https://120.53.53.53/dns-query',
-			'https://223.5.5.5/dns-query'
+			'https://223.5.5.5/dns-query',
+			'https://223.6.6.6/dns-query'
 		],
 		'proxy-server-nameserver': [
-			'https://120.53.53.53/dns-query',
-			'https://223.5.5.5/dns-query'
+			'https://223.5.5.5/dns-query',
+			'https://223.6.6.6/dns-query'
 		],
 		'nameserver-policy': {
 			'geosite:cn,private': [
-				'https://120.53.53.53/dns-query',
-				'https://223.5.5.5/dns-query'
+			'https://223.5.5.5/dns-query',
+			'https://223.6.6.6/dns-query'
 			],
 			'geosite:geolocation-!cn': [
 				'https://dns.cloudflare.com/dns-query',
-				'https://dns.google/dns-query'
+				'https://cloudflare-dns.com/dns-query'
 			]
 		}
 	},
