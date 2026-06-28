@@ -36,39 +36,27 @@ export const CLASH_CONFIG = {
 		],
 		'fake-ip-filter': [
 			// Local / LAN
-			'*.lan',
-			'*.local',
 			'localhost',
 			'localhost.*',
-			'+.local',
 			'+.lan',
+			'+.local',
 			'+.home.arpa',
 			'+.in-addr.arpa',
 			'+.ip6.arpa',
-			
-			// Router / captive portal
+		
+			// Connectivity check / captive portal
 			'+.msftconnecttest.com',
 			'+.msftncsi.com',
-			'connectivitycheck.gstatic.com',
-			'connectivitycheck.android.com',
-			'clients3.google.com',
 			'captive.apple.com',
-
-			// NTP / time sync
-			'time.*.com',
+		
+			// NTP / time sync, prefer China-reachable services
 			'time.*.gov',
 			'time.*.edu.cn',
 			'time.*.apple.com',
 			'time-ios.apple.com',
 			'time1.cloud.tencent.com',
-			'ntp.*.com',
 			'ntp.aliyun.com',
-			'pool.ntp.org',
 			'+.pool.ntp.org',
-			'time.cloudflare.com',
-			'time.windows.com',
-			'time.nist.gov',
-			'time.google.com',
 		],
 		'nameserver': [
 			'https://223.5.5.5/dns-query',
