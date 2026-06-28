@@ -29,6 +29,11 @@ export const CLASH_CONFIG = {
 		'ipv6': true,
 		'respect-rules': true,
 		'enhanced-mode': 'fake-ip',
+
+		'default-nameserver': [
+			'223.5.5.5',
+			'223.6.6.6'
+		],
 		'nameserver': [
 			'https://223.5.5.5/dns-query',
 			'https://223.6.6.6/dns-query'
