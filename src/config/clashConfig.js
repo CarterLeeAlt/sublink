@@ -44,19 +44,16 @@ export const CLASH_CONFIG = {
 			'+.in-addr.arpa',
 			'+.ip6.arpa',
 		
-			// Connectivity check / captive portal
+			// Windows / Apple check
 			'+.msftconnecttest.com',
 			'+.msftncsi.com',
 			'captive.apple.com',
 		
-			// NTP / time sync, prefer China-reachable services
-			'time.*.gov',
-			'time.*.edu.cn',
+			// China-friendly time sync
 			'time.*.apple.com',
 			'time-ios.apple.com',
 			'time1.cloud.tencent.com',
-			'ntp.aliyun.com',
-			'+.pool.ntp.org',
+			'ntp.aliyun.com'
 		],
 		'nameserver': [
 			'https://223.5.5.5/dns-query',
