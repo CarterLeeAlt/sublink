@@ -80,8 +80,8 @@ export const CLASH_CONFIG = {
 		],
 		'nameserver-policy': {
 			'geosite:cn,private': [
-			'https://223.5.5.5/dns-query',
-			'https://223.6.6.6/dns-query'
+				'https://223.5.5.5/dns-query',
+				'https://223.6.6.6/dns-query'
 			],
 			'geosite:geolocation-!cn': [
 				'https://dns.cloudflare.com/dns-query',
