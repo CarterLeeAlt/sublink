@@ -40,7 +40,9 @@ export function emitClashRules(rules = [], translator) {
         .filter(rule => Array.isArray(rule.ip_rules) && rule.ip_rules[0])
         .forEach(rule => {
             rule.ip_rules.forEach(ip => {
-                results.push(`RULE-SET,${ip}-ip,${translator('outboundNames.' + rule.outbound)},no-resolve`);
+                const outbound = translator('outboundNames.' + rule.outbound);
+                const noResolve = ['google', 'telegram'].includes(ip) ? ',no-resolve' : '';
+                results.push(`RULE-SET,${ip}-ip,${outbound}${noResolve}`);
             });
         });
 
