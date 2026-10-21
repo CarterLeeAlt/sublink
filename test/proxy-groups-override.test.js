@@ -392,8 +392,7 @@ proxy-groups:
     });
 
     describe('DNS Config Merging', () => {
-        it('ClashConfigBuilder should merge DNS nameserver arrays from multiple sources', async () => {
-            // First subscription with DNS config
+        it('incoming nameserver replaces the base list instead of appending to it', async () => {
             const input1 = `
 proxies:
   - name: Node-A
@@ -412,25 +411,59 @@ dns:
 `;
             const builder = new ClashConfigBuilder(input1, 'minimal', [], null, 'zh-CN', 'test-agent');
 
-            // Simulate applying second subscription's DNS config
-            builder.mergeDnsConfig = builder.mergeDnsConfig.bind(builder);
             const existingDns = { enable: true, nameserver: ['8.8.8.8', '8.8.4.4'], fallback: ['1.0.0.1'] };
             const incomingDns = { nameserver: ['1.1.1.1', '8.8.8.8'], fallback: ['9.9.9.9'] };
 
             const merged = builder.mergeDnsConfig(existingDns, incomingDns);
 
-            // Should merge and deduplicate nameserver
-            expect(merged.nameserver).toContain('8.8.8.8');
-            expect(merged.nameserver).toContain('8.8.4.4');
-            expect(merged.nameserver).toContain('1.1.1.1');
-            expect(merged.nameserver.filter(n => n === '8.8.8.8')).toHaveLength(1); // No duplicates
-
-            // Should merge fallback
-            expect(merged.fallback).toContain('1.0.0.1');
-            expect(merged.fallback).toContain('9.9.9.9');
+            // Replacement keeps exactly one resolver set, so no stale domestic
+            // entry can survive next to the incoming foreign one.
+            expect(merged.nameserver).toEqual(['1.1.1.1', '8.8.8.8']);
+            expect(merged.fallback).toEqual(['9.9.9.9']);
 
             // Should preserve other fields
             expect(merged.enable).toBe(true);
+        });
+
+        it('incoming domestic nameserver must not coexist with the base foreign list', async () => {
+            const input = `
+proxies:
+  - name: Node-A
+    type: ss
+    server: a.example.com
+    port: 443
+    cipher: aes-128-gcm
+    password: test
+dns:
+  enable: true
+  nameserver:
+    - https://223.5.5.5/dns-query
+    - https://223.6.6.6/dns-query
+`;
+            const builder = new ClashConfigBuilder(input, 'minimal', [], null, 'zh-CN', 'test-agent');
+            await builder.build();
+
+            const built = yaml.load(builder.formatConfig());
+            const nameservers = built.dns.nameserver;
+
+            // The subscription is parsed as a Clash YAML override here, so the
+            // base foreign resolvers must be gone rather than merged with it.
+            expect(nameservers).toEqual([
+                'https://223.5.5.5/dns-query',
+                'https://223.6.6.6/dns-query'
+            ]);
+            expect(nameservers.some(ns => ns.includes('1.1.1.1'))).toBe(false);
+        });
+
+        it('empty incoming nameserver keeps the base resolvers', async () => {
+            const builder = new ClashConfigBuilder('', 'minimal', [], null, 'zh-CN', 'test-agent');
+
+            const merged = builder.mergeDnsConfig(
+                { nameserver: ['https://1.1.1.1/dns-query'] },
+                { nameserver: [] }
+            );
+
+            expect(merged.nameserver).toEqual(['https://1.1.1.1/dns-query']);
         });
 
         it('ClashConfigBuilder should merge fake-ip-filter arrays', async () => {

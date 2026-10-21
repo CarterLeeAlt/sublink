@@ -259,8 +259,15 @@ export class BaseConfigBuilder {
     }
 
     /**
-     * Merge DNS configuration with intelligent array merging
-     * Arrays like nameserver, fallback, fake-ip-filter are merged instead of overwritten
+     * Merge DNS configuration from an incoming subscription.
+     *
+     * `nameserver` and `fallback` decide where queries are sent, so appending an
+     * incoming list to the base list makes every resolver a candidate winner: one
+     * domestic entry next to foreign ones leaks queries to the domestic server.
+     * The incoming value therefore replaces the base value, and the subscriber
+     * stays authoritative for its own DNS. `fake-ip-filter` and
+     * `nameserver-policy` stay additive because more entries only narrow what
+     * gets a fake IP or route more names to an explicit resolver.
      * @param {object} existing - Existing DNS config
      * @param {object} incoming - Incoming DNS config to merge
      * @returns {object} - Merged DNS config
@@ -271,11 +278,17 @@ export class BaseConfigBuilder {
         }
 
         const result = deepCopy(existing);
-        // Array fields that should be merged instead of overwritten
-        const mergeableArrayKeys = new Set(['nameserver', 'fallback', 'fake-ip-filter']);
+        const replacingArrayKeys = new Set(['nameserver', 'fallback']);
+        const mergingArrayKeys = new Set(['fake-ip-filter']);
 
         Object.entries(incoming).forEach(([key, value]) => {
-            if (mergeableArrayKeys.has(key) && Array.isArray(value)) {
+            if (replacingArrayKeys.has(key) && Array.isArray(value)) {
+                // An empty list would leave the client without resolvers, so treat
+                // it as "no opinion" instead of wiping the base config.
+                if (value.length > 0) {
+                    result[key] = [...new Set(value)];
+                }
+            } else if (mergingArrayKeys.has(key) && Array.isArray(value)) {
                 if (Array.isArray(result[key])) {
                     // Merge arrays and deduplicate
                     result[key] = [...new Set([...result[key], ...value])];

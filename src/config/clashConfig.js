@@ -29,7 +29,12 @@ export const CLASH_CONFIG = {
 		'ipv6': true,
 		'respect-rules': true,
 		'enhanced-mode': 'fake-ip',
+		'fake-ip-range': '198.18.0.1/16',
+		'fake-ip-filter-mode': 'blacklist',
 
+		// Only used to resolve hostnames of DNS servers. Every resolver below is
+		// an IP literal, and keeping this domestic means it can stay unreachable-
+		// free while bootstrap never becomes a leak path on its own.
 		'default-nameserver': [
 			'223.5.5.5',
 			'223.6.6.6'
@@ -55,24 +60,39 @@ export const CLASH_CONFIG = {
 			'time1.cloud.tencent.com',
 			'ntp.aliyun.com'
 		],
+		// Default resolver for every name the rules do not classify. It must stay
+		// outside mainland China: a domestic resolver here answers A/AAAA queries
+		// for unlisted domains, which is what DNS leak tests observe.
 		'nameserver': [
-			'https://223.5.5.5/dns-query',
-			'https://223.6.6.6/dns-query'
+			'https://1.1.1.1/dns-query',
+			'https://1.0.0.1/dns-query'
 		],
+		// Resolves the proxy nodes' own hostnames. Domestic resolvers answer
+		// fastest and keep node bootstrap independent from foreign reachability.
 		'proxy-server-nameserver': [
 			'https://223.5.5.5/dns-query',
 			'https://223.6.6.6/dns-query'
 		],
 		'nameserver-policy': {
+			// Domestic and private names resolve domestically, so CDN geolocation
+			// and fake-ip exemptions keep working.
 			'geosite:cn,private': [
 				'https://223.5.5.5/dns-query',
 				'https://223.6.6.6/dns-query'
 			],
+			// Known-foreign names resolve abroad, which keeps their answers clean.
 			'geosite:geolocation-!cn': [
-				'https://dns.cloudflare.com/dns-query',
-				'https://cloudflare-dns.com/dns-query'
+				'https://1.1.1.1/dns-query',
+				'https://1.0.0.1/dns-query'
 			]
-		}
+		},
+		// DIRECT traffic would otherwise fall back to `nameserver` and resolve
+		// domestic sites through a foreign resolver, yielding wrong CDN nodes.
+		'direct-nameserver': [
+			'https://223.5.5.5/dns-query',
+			'https://223.6.6.6/dns-query'
+		],
+		'direct-nameserver-follow-policy': true
 	},
 	'proxies': [],
 	'proxy-groups': []
