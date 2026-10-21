@@ -11,6 +11,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 从第一性原理解构问题，警惕 XY 问题；发现不合理方向立即指出，不奉承。
 - 架构权衡参考 `ddia-principles` 和 `software-design-philosophy`。
 
+## Git 工作流
+
+- 改动直接提交并推送到 `main`，不开 feature 分支、不走 PR；合并上游也一样，`git merge upstream/main` 后直接推送 `main`。
+- 推送前跑 `npm test`，全绿再推。
+- 上游仓库是 `7Sageer/sublink-worker`，远端名 `upstream`。合并上游前先 `git fetch upstream` 看差异，合并后在 `main` 上验证。
+
 ## 项目概览
 
 Sublink Worker 是多平台代理订阅转换器：将各类协议（ShadowSocks/VMess/VLESS/Hysteria2/Trojan/TUIC）转为客户端配置（Sing-Box/Clash/Xray/Surge）。同一份代码跑在 Cloudflare Workers / Node.js / Vercel / Docker 上。技术栈：Hono（Web/JSX SSR）+ Vitest + Wrangler + esbuild + ioredis。
