@@ -15,6 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - 改动直接提交并推送到 `main`，不开 feature 分支、不走 PR；合并上游也一样，`git merge upstream/main` 后直接推送 `main`。
 - 推送前跑 `npm test`，全绿再推。
+- 一次 push 只对最后一个提交触发 Cloudflare Workers Builds，因此合并上游后先单独推送合并提交，再推后续改动，保证合并提交有自己的构建记录。
 - 上游仓库是 `7Sageer/sublink-worker`，远端名 `upstream`。合并上游前先 `git fetch upstream` 看差异，合并后在 `main` 上验证。
 
 ## 项目概览
