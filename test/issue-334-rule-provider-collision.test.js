@@ -53,6 +53,25 @@ describe('Issue #334: rule-provider key collision fix', () => {
     expect(config.rules).toContainEqual(expect.stringMatching(/^RULE-SET,geolocation-!cn,.*非中国/));
   });
 
+  it('every IP rule set carries no-resolve so unmatched domains stay unresolved', async () => {
+    const builder = new ClashConfigBuilder(SS_INPUT, 'balanced', [], null, 'zh-CN', 'mihomo/1.0');
+    const yamlText = await builder.build();
+    const config = yaml.load(yamlText);
+
+    // Without no-resolve the client resolves the domain just to test an IP rule,
+    // so any name no domain rule covers gets looked up through the configured
+    // upstream DNS and shows up as a leak on resolver-echo test sites.
+    const ipRules = config.rules.filter(rule => /^RULE-SET,[\w-]+-ip,/.test(rule));
+    expect(ipRules.length).toBeGreaterThan(0);
+
+    const withoutNoResolve = ipRules.filter(rule => !rule.endsWith(',no-resolve'));
+    expect(withoutNoResolve).toEqual([]);
+
+    // The two sets that previously lost the flag must be covered explicitly.
+    expect(config.rules).toContainEqual(expect.stringMatching(/^RULE-SET,cn-ip,.*no-resolve$/));
+    expect(config.rules).toContainEqual(expect.stringMatching(/^RULE-SET,private-ip,.*no-resolve$/));
+  });
+
   it('google domain rule should come before non-china rule', async () => {
     const builder = new ClashConfigBuilder(SS_INPUT, 'balanced', [], null, 'zh-CN', 'mihomo/1.0');
     const yamlText = await builder.build();

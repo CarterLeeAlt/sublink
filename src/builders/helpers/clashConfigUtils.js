@@ -36,13 +36,16 @@ export function emitClashRules(rules = [], translator) {
             });
         });
 
+    // IP rule sets match on the resolved address, so without `no-resolve` the
+    // client has to resolve the domain first and that lookup goes to whatever
+    // upstream DNS is configured. Names covered by no domain rule would then be
+    // resolved locally instead of being handed to the proxy as a hostname.
     rules
         .filter(rule => Array.isArray(rule.ip_rules) && rule.ip_rules[0])
         .forEach(rule => {
             rule.ip_rules.forEach(ip => {
                 const outbound = translator('outboundNames.' + rule.outbound);
-                const noResolve = ['google', 'telegram'].includes(ip) ? ',no-resolve' : '';
-                results.push(`RULE-SET,${ip}-ip,${outbound}${noResolve}`);
+                results.push(`RULE-SET,${ip}-ip,${outbound},no-resolve`);
             });
         });
 
