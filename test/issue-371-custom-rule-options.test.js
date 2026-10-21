@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { SingboxConfigBuilder } from '../src/builders/SingboxConfigBuilder.js';
 import { ClashConfigBuilder } from '../src/builders/ClashConfigBuilder.js';
 import { SurgeConfigBuilder } from '../src/builders/SurgeConfigBuilder.js';
+import { createTranslator } from '../src/i18n/index.js';
 
 describe('Issue #371 - custom rule groups keep full proxy choices without country groups', () => {
     const inputString = [
@@ -13,18 +14,25 @@ describe('Issue #371 - custom rule groups keep full proxy choices without countr
         { name: 'Custom-Rule', site_rules: ['google'], ip_rules: [], domain_suffix: [], domain_keyword: [] }
     ];
 
+    // Take the group labels from the translator so emoji changes in the i18n
+    // table do not turn into test failures unrelated to this behaviour.
+    const t = createTranslator('zh-CN');
+    const nodeSelectName = t('outboundNames.Node Select');
+    const autoSelectName = t('outboundNames.Auto Select');
+    const manualSwitchName = t('outboundNames.Manual Switch');
+
     const expectedSingboxCountryMembers = [
-        '🚀 节点选择',
-        '⚡ 自动选择',
-        '🖐️ 手动切换',
+        nodeSelectName,
+        autoSelectName,
+        manualSwitchName,
         'US-Node-1',
         'UK-Node-1',
         'DIRECT'
     ];
 
     const expectedSingboxFlatMembers = [
-        '🚀 节点选择',
-        '⚡ 自动选择',
+        nodeSelectName,
+        autoSelectName,
         'US-Node-1',
         'UK-Node-1',
         'DIRECT'
