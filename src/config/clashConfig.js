@@ -3,6 +3,8 @@
  * Base configuration template for Clash client
  */
 
+import { META_RULES_RELEASE_BASE_URL } from './ruleUrls.js';
+
 export const CLASH_CONFIG = {
 	'port': 7890,
 	'socks-port': 7891,
@@ -16,10 +18,13 @@ export const CLASH_CONFIG = {
 	'geodata-loader': 'standard',
 	'geo-update-interval': 24,
 	'geox-url': {
-		'geoip': "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat",
-		'geosite': "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat",
-		'mmdb': "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb",
-		'asn': "https://github.com/xishang0128/geoip/releases/download/latest/GeoLite2-ASN.mmdb"
+		'geoip': `${META_RULES_RELEASE_BASE_URL}geoip.dat`,
+		'geosite': `${META_RULES_RELEASE_BASE_URL}geosite.dat`,
+		'mmdb': `${META_RULES_RELEASE_BASE_URL}country.mmdb`,
+		// mihomo's own default for `asn` lives here as well, which keeps the ASN
+		// database consistent with the other three files instead of tracking a
+		// separate third-party release feed.
+		'asn': `${META_RULES_RELEASE_BASE_URL}GeoLite2-ASN.mmdb`
 	},
 	'rule-providers': {
 		// 将由代码自动生成
