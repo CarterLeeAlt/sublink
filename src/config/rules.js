@@ -83,7 +83,19 @@ export const UNIFIED_RULES = [
 	},
 	{
 		name: 'Financial',
-		site_rules: ['paypal', 'visa', 'mastercard', 'stripe', 'wise'],
+		site_rules: ['paypal', 'visa', 'mastercard', 'stripe', 'wise', 'binance', 'bybit', 'kraken'],
+		// Crypto exchanges and stablecoin neobanks have no upstream geosite list,
+		// so they are inlined rather than waiting for a rule-set update.
+		domain_suffix: [
+			'bitget.com',
+			'bitget.cloud',
+			'kast.xyz',
+			'kastfinance.com',
+			'plasma.org',
+			'plasma.to',
+			'payward.com',
+			'krak.app'
+		],
 		ip_rules: []
 	},
 	{
@@ -104,7 +116,7 @@ export const REJECT_ACTION_RULES = new Set(['Ad Block']);
 
 export const PREDEFINED_RULE_SETS = {
 	minimal: ['Location:CN', 'Private', 'Non-China'],
-	balanced: ['Location:CN', 'Private', 'Non-China', 'Github', 'Google', 'Youtube', 'AI Services', 'Telegram', 'Microsoft', 'Apple', 'Social Media', 'Streaming'],
+	balanced: ['Location:CN', 'Private', 'Non-China', 'Github', 'Google', 'Youtube', 'AI Services', 'Telegram', 'Microsoft', 'Apple', 'Social Media', 'Streaming', 'Financial'],
 	comprehensive: UNIFIED_RULES.map(rule => rule.name)
 };
 
